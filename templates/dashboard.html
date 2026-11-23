@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block page_name %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">EXECUTIVE OVERVIEW</p>
+    <h1>Operations Dashboard</h1>
+    <p class="page-desc">Live metrics, catalog availability, and circulation activity.</p>
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <a class="btn" href="{{ url_for('loans') }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+      </svg>
+      Issue a Book
+    </a>
+    <a class="btn primary" href="{{ url_for('books') }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Add New Book
+    </a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Unique Titles</span>
+      <div class="stat-icon primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.books }}</div>
+    <div class="stat-sub">Active in repository</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Total Inventory</span>
+      <div class="stat-icon info">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.copies }}</div>
+    <div class="stat-sub">Physical accessioned copies</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Available Copies</span>
+      <div class="stat-icon success">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.available }}</div>
+    <div class="stat-sub">Ready for immediate checkout</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Active Members</span>
+      <div class="stat-icon purple">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.members }}</div>
+    <div class="stat-sub">Registered student/faculty accounts</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Currently Issued</span>
+      <div class="stat-icon warning">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.issued }}</div>
+    <div class="stat-sub">Active borrowings in circulation</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Overdue Items</span>
+      <div class="stat-icon danger">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">{{ stats.overdue }}</div>
+    <div class="stat-sub">Requires reminder notice</div>
+  </div>
+</div>
+
+<div class="two-col">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Recent Circulation Activity</h2>
+      <a href="{{ url_for('loans') }}">
+        View full log
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Book Title</th>
+            <th>Due Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent %}
+          <tr>
+            <td>
+              <b>{{ r.full_name }}</b>
+              <small>{{ r.member_no }}</small>
+            </td>
+            <td>
+              <b>{{ r.title }}</b>
+              <small>{{ r.accession_no }}</small>
+            </td>
+            <td>
+              <span>{{ r.due_date.strftime('%b %d, %Y') if r.due_date else '—' }}</span>
+              {% if r.status == 'ISSUED' and r.days_overdue > 0 %}
+                <small style="color: #dc2626; font-weight: 600;">{{ r.days_overdue }} days overdue</small>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.status == 'RETURNED' %}
+                <span class="pill green">Returned</span>
+              {% elif r.days_overdue > 0 %}
+                <span class="pill red">Overdue</span>
+              {% else %}
+                <span class="pill amber">Issued</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">No circulation activity recorded yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Most Borrowed Titles</h2>
+        <a href="{{ url_for('reports') }}">
+          Analytics
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+
+      {% for p in popular %}
+      <div class="popular-row">
+        <div class="popular-row-content">
+          <div class="rank-badge {{ 'top' if loop.index == 1 else '' }}">#{{ loop.index }}</div>
+          <div>
+            <b>{{ p.title }}</b>
+            <small>{{ p.category_name }}</small>
+          </div>
+        </div>
+        <span class="count-pill">{{ p.borrow_count }} times</span>
+      </div>
+      {% else %}
+      <p style="color: var(--text-muted); font-size: 13px;">No borrowing history yet.</p>
+      {% endfor %}
+
+      <div class="fine-summary">
+        <div>
+          <span>Unpaid Overdue Fines</span>
+          <small style="display:block; color: #4338ca; font-size: 11px;">Pending collection</small>
+        </div>
+        <strong>₹{{ '%.2f'|format(stats.fines) }}</strong>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

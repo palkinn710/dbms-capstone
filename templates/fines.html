@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block page_name %}Fines & Penalties{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">FINANCES</p>
+    <h1>Fines & Penalties</h1>
+    <p class="page-desc">Manage overdue penalties and fee settlements.</p>
+  </div>
+</div>
+
+<div class="stats" style="grid-template-columns: repeat(3, 1fr);">
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Total Assessed</span>
+      <div class="stat-icon warning">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">₹{{ '%.2f'|format(totals.total_fines) }}</div>
+    <div class="stat-sub">Lifetime overdue charges</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Collected Revenue</span>
+      <div class="stat-icon success">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value">₹{{ '%.2f'|format(totals.total_collected) }}</div>
+    <div class="stat-sub">Successfully reconciled payments</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-header">
+      <span class="stat-label">Outstanding Balance</span>
+      <div class="stat-icon danger">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-value" style="color: #dc2626;">₹{{ '%.2f'|format(totals.total_outstanding) }}</div>
+    <div class="stat-sub">Pending settlement by patrons</div>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <h2>Fine Records</h2>
+      <small style="color: var(--text-muted);">{{ fines|length }} record{{ 's' if fines|length != 1 else '' }} in database</small>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Patron</th>
+          <th>Book Title</th>
+          <th>Original Amount</th>
+          <th>Paid Amount</th>
+          <th>Balance Due</th>
+          <th>Status</th>
+          <th style="text-align: right;">Settlement Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in fines %}
+        <tr>
+          <td>
+            <b>{{ f.full_name }}</b>
+            <small>{{ f.member_no }}</small>
+          </td>
+          <td style="max-width: 240px; white-space: normal;">
+            <b>{{ f.title }}</b>
+            <small>Due date: {{ f.due_date.strftime('%b %d, %Y') if f.due_date else '—' }}</small>
+          </td>
+          <td>
+            <span style="font-weight: 600;">₹{{ '%.2f'|format(f.amount) }}</span>
+          </td>
+          <td>
+            <span>₹{{ '%.2f'|format(f.paid_amount) }}</span>
+          </td>
+          <td>
+            {% set balance = (f.amount or 0) - (f.paid_amount or 0) %}
+            {% if balance > 0 %}
+            <span class="balance-due">₹{{ '%.2f'|format(balance) }}</span>
+            {% else %}
+            <span class="balance-settled">₹{{ '%.2f'|format(balance) }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="pill {{ f.status }}">{{ f.status }}</span>
+          </td>
+          <td style="text-align: right;">
+            {% if f.status != 'PAID' and f.status != 'WAIVED' %}
+            <form method="post" style="display:inline;">
+              <input type="hidden" name="fine_id" value="{{ f.fine_id }}">
+              <button class="btn small primary" title="Mark this fine as settled">
+                Record Payment
+              </button>
+            </form>
+            {% else %}
+            <span style="color: #059669; font-weight: 600; font-size: 12px;">Settled ✓</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">
+            No fines have been generated or recorded.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block page_name %}Member Directory{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">PATRON MANAGEMENT</p>
+    <h1>Library Members</h1>
+    <p class="page-desc">Register students, faculty, and visiting scholars; manage borrowing privileges.</p>
+  </div>
+</div>
+
+<div class="two-col align-start">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Register Patron</h2>
+    </div>
+    <form method="post" class="form-stack">
+      <div>
+        <label>Membership / Card Number *
+          <input name="member_no" required placeholder="e.g. MEM-2024-009">
+        </label>
+      </div>
+
+      <div>
+        <label>Full Name *
+          <input name="full_name" required placeholder="e.g. Aarav Sharma">
+        </label>
+      </div>
+
+      <div>
+        <label>Email Address *
+          <input type="email" name="email" required placeholder="e.g. aarav.sharma@gmail.com">
+        </label>
+      </div>
+
+      <div>
+        <label>Contact Phone
+          <input name="phone" placeholder="e.g. +91 98765 43210">
+        </label>
+      </div>
+
+      <button class="btn primary full" style="margin-top: 8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <line x1="20" y1="8" x2="20" y2="14"></line>
+          <line x1="23" y1="11" x2="17" y2="11"></line>
+        </svg>
+        Register Member
+      </button>
+    </form>
+  </section>
+
+  <!-- MEMBERS TABLE -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Active Patrons</h2>
+        <small style="color: var(--text-muted);">{{ members|length }} registered member{{ 's' if members|length != 1
+          else '' }}</small>
+      </div>
+      <form class="search" method="get">
+        <input name="q" value="{{ q }}" placeholder="Search name, ID or email...">
+        <button class="btn" type="submit">Search</button>
+        {% if q %}
+        <a href="{{ url_for('members') }}" class="btn" style="padding: 8px 10px;" title="Clear search">✕</a>
+        {% endif %}
+      </form>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Patron Details</th>
+            <th>Contact</th>
+            <th>Joined On</th>
+            <th>Activity</th>
+            <th>Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in members %}
+          <tr>
+            <td>
+              <b>{{ m.full_name }}</b>
+              <small>{{ m.member_no }}</small>
+            </td>
+            <td>
+              <span>{{ m.email }}</span>
+              <small>{{ m.phone or 'No phone listed' }}</small>
+            </td>
+            <td>
+              {{ m.joined_on.strftime('%b %d, %Y') if m.joined_on else '—' }}
+            </td>
+            <td>
+              <span style="font-weight: 600;">{{ m.total_borrows }} borrowed</span>
+              {% if m.active_loans > 0 %}
+              <small style="color: #b45309; font-weight: 600;">{{ m.active_loans }} active loan{{ 's' if m.active_loans
+                > 1 else '' }}</small>
+              {% endif %}
+            </td>
+            <td>
+              <span class="pill {{ 'green' if m.status == 'ACTIVE' else 'gray' }}">
+                {{ m.status }}
+              </span>
+            </td>
+            <td style="text-align: right;">
+              <form method="post" action="{{ url_for('member_status', member_id=m.member_id) }}"
+                style="display:inline;">
+                <button class="btn small" title="Toggle active/inactive status">
+                  {{ 'Deactivate' if m.status == 'ACTIVE' else 'Activate' }}
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+              No members found matching your search.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

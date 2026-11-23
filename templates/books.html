@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block page_name %}Book Catalogue{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">COLLECTION</p>
+    <h1>Book Catalogue</h1>
+    <p class="page-desc">Manage books, inventory copies, and categories.</p>
+  </div>
+</div>
+
+<div class="two-col align-start">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Register New Book</h2>
+    </div>
+    <form method="post" class="form-grid">
+      <div class="span2">
+        <label>Book Title *
+          <input name="title" required placeholder="e.g. Wings of Fire">
+        </label>
+      </div>
+
+      <div>
+        <label>ISBN *
+          <input name="isbn" required placeholder="e.g. 978-0132350884">
+        </label>
+      </div>
+
+      <div>
+        <label>Publication Year
+          <input type="number" name="published_year" min="1400" max="2100" placeholder="e.g. 2023">
+        </label>
+      </div>
+
+      <div>
+        <label>Author Name *
+          <input type="text" name="author_name" required placeholder="e.g. Robert C. Martin">
+        </label>
+      </div>
+
+      <div>
+        <label>Publisher Name
+          <input type="text" name="publisher_name" placeholder="e.g. Pearson India">
+        </label>
+      </div>
+
+      <div>
+        <label>Category
+          <select name="category_id">
+            <option value="">Select subject domain</option>
+            {% for c in categories %}
+            <option value="{{ c.category_id }}">{{ c.category_name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+
+      <div>
+        <label>Initial Copies
+          <input type="number" name="copies" min="1" max="50" value="2">
+        </label>
+      </div>
+
+      <div class="span2" style="margin-top: 8px;">
+        <button class="btn primary full">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          Save to Inventory
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- BOOKS TABLE -->
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Catalogue Index</h2>
+        <small style="color: var(--text-muted);">{{ books|length }} title{{ 's' if books|length != 1 else '' }}
+          found</small>
+      </div>
+      <form class="search" method="get">
+        <input name="q" value="{{ q }}" placeholder="Search title, ISBN or author...">
+        <button class="btn" type="submit">Search</button>
+        {% if q %}
+        <a href="{{ url_for('books') }}" class="btn" style="padding: 8px 10px;" title="Clear search">✕</a>
+        {% endif %}
+      </form>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Title & ISBN</th>
+            <th>Author & Publisher</th>
+            <th>Category</th>
+            <th>Availability</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in books %}
+          <tr>
+            <td style="max-width: 240px; white-space: normal;">
+              <b>{{ b.title }}</b>
+              <small>{{ b.isbn }} {% if b.published_year %}· {{ b.published_year }}{% endif %}</small>
+            </td>
+            <td style="max-width: 180px; white-space: normal;">
+              <span>{{ b.authors_list }}</span>
+              <small>{{ b.publisher_name }}</small>
+            </td>
+            <td>
+              <span class="pill gray" style="text-transform: none; font-weight: 600;">{{ b.category_name }}</span>
+            </td>
+            <td>
+              {% if (b.available_copies or 0)|int > 0 %}
+              <span class="pill green">{{ b.available_copies }} / {{ b.total_copies }} Available</span>
+              {% else %}
+              <span class="pill red">All Issued ({{ b.total_copies }})</span>
+              {% endif %}
+            </td>
+            <td style="text-align: right;">
+              <form method="post" action="{{ url_for('delete_book', book_id=b.book_id) }}"
+                onsubmit="return confirm('Are you sure you want to permanently remove this book and all its accession copies?');"
+                style="display: inline;">
+                <button class="btn small danger" title="Delete book title">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">
+              No books matching your query were found in the catalog.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
